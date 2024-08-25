@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyStile.in - Tailored Just for You</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        header, nav, .container, footer {
+            padding: 1rem;
+        }
+        header {
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        nav {
+            background-color: #333;
+            color: #fff;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            justify-content: space-around;
+        }
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+        .hidden {
+            display: none;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            max-width: 400px;
+            margin: auto;
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 10px;
+        }
+        #chatbot {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 300px;
+            overflow-y: scroll;
+        }
+        #chat-messages {
+            margin-bottom: 10px;
+        }
+        #recommendations {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .recommendation {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>MyStile.in</h1>
+        <p>Tailored Just for You</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#" onclick="showSection('home')">Home</a></li>
+            <li><a href="#" onclick="showSection('measurement')">Measurement</a></li>
+            <li><a href="#" onclick="showSection('recommendations')">Recommendations</a></li>
+            <li><a href="#" onclick="showSection('chatbot')">Style Advisor</a></li>
+            <li><a href="#" onclick="showSection('profile')">Profile</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <section id="home">
+            <h2>Welcome to MyStile.in</h2>
+            <p>Discover personalized clothing recommendations based on your unique body measurements.</p>
+            <button onclick="showSection('measurement')">Get Started</button>
+        </section>
+
+        <section id="measurement" class="hidden">
+            <h2>Enter Your Measurements</h2>
+            <form id="measurement-form">
+                <input type="number" placeholder="Shoulder Width (cm)" required>
+                <input type="number" placeholder="Chest/Bust Circumference (cm)" required>
+                <input type="number" placeholder="Waist Circumference (cm)" required>
+                <input type="number" placeholder="Hip Circumference (cm)" required>
+                <input type="number" placeholder="Inseam (cm)" required>
+                <button type="submit">Calculate Body Type</button>
+            </form>
+        </section>
+
+        <section id="recommendations" class="hidden">
+            <h2>Your Personalized Recommendations</h2>
+            <div id="body-type-result"></div>
+            <div id="recommendation-list"></div>
+        </section>
+
+        <section id="chatbot" class="hidden">
+            <h2>Style Advisor Chatbot</h2>
+            <div id="chat-messages"></div>
+            <input type="text" id="chat-input" placeholder="Ask for styling advice...">
+            <button onclick="sendMessage()">Send</button>
+        </section>
+
+        <section id="profile" class="hidden">
+            <h2>Your Profile</h2>
+            <div id="user-info"></div>
+            <button onclick="updateMeasurements()">Update Measurements</button>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 MyStile.in. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Simulated user data (replace with actual backend integration)
+        let userData = {
+            measurements: {},
+            bodyType: '',
+            recommendations: []
+        };
+
+        function showSection(sectionId) {
+            document.querySelectorAll('section').forEach(section => section.classList.add('hidden'));
+            document.getElementById(sectionId).classList.remove('hidden');
+        }
+
+        document.getElementById('measurement-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const inputs = this.querySelectorAll('input');
+            inputs.forEach(input => {
+                userData.measurements[input.placeholder.split(' ')[0].toLowerCase()] = input.value;
+            });
+            calculateBodyType();
+            showSection('recommendations');
+        });
+
+        function calculateBodyType() {
+            // Simplified body type calculation (replace with actual algorithm)
+            const waist = parseFloat(userData.measurements.waist);
+            const hip = parseFloat(userData.measurements.hip);
+            const bust = parseFloat(userData.measurements['chest/bust']);
+
+            if (hip > bust && hip > waist) {
+                userData.bodyType = 'Pear';
+            } else if (bust > hip && bust > waist) {
+                userData.bodyType = 'Inverted Triangle';
+            } else if (Math.abs(bust - hip) <= 5 && (bust - waist) >= 18 && (hip - waist) >= 18) {
+                userData.bodyType = 'Hourglass';
+            } else {
+                userData.bodyType = 'Rectangle';
+            }
+
+            document.getElementById('body-type-result').innerHTML = `Your body type: ${userData.bodyType}`;
+            generateRecommendations();
+        }
+
+        function generateRecommendations() {
+            // Simplified recommendation generation (replace with actual algorithm)
+            const recommendations = {
+                'Pear': ['A-line dresses', 'Boot cut jeans', 'Boat neck tops'],
+                'Inverted Triangle': ['Wrap dresses', 'Wide-leg pants', 'V-neck tops'],
+                'Hourglass': ['Wrap dresses', 'High-waisted skirts', 'Fitted jackets'],
+                'Rectangle': ['Peplum tops', 'Belted dresses', 'Straight leg jeans']
+            };
+
+            userData.recommendations = recommendations[userData.bodyType];
+            const recommendationList = document.getElementById('recommendation-list');
+            recommendationList.innerHTML = userData.recommendations.map(item => 
+                `<div class="recommendation">${item}</div>`
+            ).join('');
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (message) {
+                addChatMessage('User', message);
+                // Simulate chatbot response (replace with actual AI integration)
+                setTimeout(() => {
+                    const response = `Here's some advice about ${message}: ...`;
+                    addChatMessage('Chatbot', response);
+                }, 1000);
+                input.value = '';
+            }
+        }
+
+        function addChatMessage(sender, message) {
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.innerHTML += `<p><strong>${sender}:</strong> ${message}</p>`;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function updateMeasurements() {
+            showSection('measurement');
+        }
+
+        // Initialize with home section visible
+        showSection('home');
+    </script>
+</body>
+</html>
